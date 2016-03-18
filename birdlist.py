@@ -29,7 +29,7 @@ def fetch_userlist(url):
     tw_urls = (a.get('href') for a in tw_links)
 
     r = re.compile(r'https?://twitter.*/(?P<user>[A-Za-z0-9_]+?)/?$')
-    return [r.match(u).groupdict()['user'] for u in tw_urls]
+    return [r.match(u).groupdict()['user'].lower() for u in tw_urls]
 
 
 def fetch_archive_urls(url, location):
@@ -54,25 +54,25 @@ if __name__ == '__main__':
     args = build_argparser(settings.DEFAULT_URL, settings.ACCESS_TOKEN, settings.ACCESS_TOKEN_SECRET,
                            settings.DEFAULT_LIST).parse_args()
 
-    t = Twitter(settings.CONSUMER_TOKEN, settings.CONSUMER_SECRET)
-    if not (args.access_token and args.secret):
-        (access_token, secret) = t.generate_access_token()
-
-        print("your access_token: %s" % access_token)
-        print("your access_token_secret: %s" % secret)
+    if args.archive:
+        urls = fetch_archive_urls(args.url, settings.WM_LOCATION)
+        print("\n".join(urls))
     else:
-        (access_token, secret) = (args.access_token, args.secret)
+        raw_user_list = fetch_userlist(args.url)
+        users = cleanup_users(raw_user_list, settings.DUMMY_NAMES)
 
-    at = t.authenticate(access_token, secret)
-    l = at.get_list(args.list)
-    print(l)
+        t = Twitter(settings.CONSUMER_TOKEN, settings.CONSUMER_SECRET)
+        if not (args.access_token and args.secret):
+            (access_token, secret) = t.generate_access_token()
 
-    # if args.archive:
-    #     urls = fetch_archive_urls(args.url, settings.WM_LOCATION)
-    #     print("\n".join(urls))
-    # else:
-    #     raw_user_list = fetch_userlist(args.url)
-    #     users = cleanup_users(raw_user_list, settings.DUMMY_NAMES)
-    #     print(users)
+            print("your access_token: %s" % access_token)
+            print("your access_token_secret: %s" % secret)
+        else:
+            (access_token, secret) = (args.access_token, args.secret)
 
+        at = t.authenticate(access_token, secret)
+        tw_list = at.get_list(args.list)
 
+        count = at.add_missing_members(tw_list, users)
+        if count > 0:
+            print("added %d count users to list %s" % (count, args.list))
