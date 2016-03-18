@@ -13,6 +13,14 @@ class AuthorizedTwitter:
 
         return l
 
+    def add_missing_members(self, tw_list, members):
+        list_id = tw_list['id']
+        current_members = self.t.get_list_members(list_id=list_id)
+        current_member_names = set([u['screen_name'].lower() for u in current_members['users']])
+        missing_members = members - current_member_names
+        self.t.create_list_members(list_id=list_id, screen_name=",".join(missing_members))
+        return len(missing_members)
+
 
 class Twitter:
     def __init__(self, consumer_token, consumer_secret):
