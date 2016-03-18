@@ -1,5 +1,7 @@
 WM_LOCATION = 'Kassel'
 
+DEFAULT_LIST = 'wmks'
+
 try:
     from settings_local import *
 except:

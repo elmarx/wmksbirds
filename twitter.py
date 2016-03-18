@@ -5,6 +5,15 @@ class AuthorizedTwitter:
     def __init__(self, consumer_token, consumer_secret, access_token, secret):
         self.t = Twython(consumer_token, consumer_secret, access_token, secret)
 
+    def get_list(self, name):
+        lists = self.t.show_owned_lists()
+        l = next((l for l in lists['lists'] if l['name'] == name), None)
+        if not l:
+            l = self.t.create_list(name=name, mode='private')
+
+        return l
+
+
 class Twitter:
     def __init__(self, consumer_token, consumer_secret):
         self.t = Twython(consumer_token, consumer_secret)

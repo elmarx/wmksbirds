@@ -8,7 +8,7 @@ from lxml import html
 from twitter import Twitter
 
 
-def build_argparser(default_url, default_access_token, default_secret):
+def build_argparser(default_url, default_access_token, default_secret, default_list):
     parser = argparse.ArgumentParser(description="add WMKS Twitter users to a twitter list")
     parser.add_argument("-u", "--url", type=str, help="URL to crawl for twitter users", default=default_url)
     parser.add_argument("-a", "--archive", action='store_true',
@@ -17,6 +17,8 @@ def build_argparser(default_url, default_access_token, default_secret):
                         help="Twitter API access token")
     parser.add_argument("-s", "--secret", type=str, default=default_secret,
                         help="Twitter API access token secret")
+    parser.add_argument("-l", "--list", type=str, default=default_list,
+                        help="Twitter list to add users to, will be created if it does not exist")
 
     return parser
 
@@ -49,7 +51,8 @@ def cleanup_users(raw_user_list, dummies):
     return set([entry for entry in raw_user_list if entry not in dummies])
 
 if __name__ == '__main__':
-    args = build_argparser(settings.DEFAULT_URL, settings.ACCESS_TOKEN, settings.ACCESS_TOKEN_SECRET).parse_args()
+    args = build_argparser(settings.DEFAULT_URL, settings.ACCESS_TOKEN, settings.ACCESS_TOKEN_SECRET,
+                           settings.DEFAULT_LIST).parse_args()
 
     t = Twitter(settings.CONSUMER_TOKEN, settings.CONSUMER_SECRET)
     if not (args.access_token and args.secret):
@@ -60,6 +63,9 @@ if __name__ == '__main__':
     else:
         (access_token, secret) = (args.access_token, args.secret)
 
+    at = t.authenticate(access_token, secret)
+    l = at.get_list(args.list)
+    print(l)
 
     # if args.archive:
     #     urls = fetch_archive_urls(args.url, settings.WM_LOCATION)
