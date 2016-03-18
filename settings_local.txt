@@ -1,0 +1,7 @@
+# if not given, "birdlist" will do the "OAuth-Dance" for you
+ACCESS_TOKEN = None
+ACCESS_TOKEN_SECRET = None
+
+# go to https://apps.twitter.com and register an app to obtain the outh-token and -secret
+CONSUMER_TOKEN = ''
+CONSUMER_SECRET = ''
