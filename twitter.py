@@ -19,7 +19,7 @@ class AuthorizedTwitter:
         current_member_names = set([u['screen_name'].lower() for u in current_members['users']])
         missing_members = members - current_member_names
         self.t.create_list_members(list_id=list_id, screen_name=",".join(missing_members))
-        return len(missing_members)
+        return missing_members
 
 
 class Twitter:

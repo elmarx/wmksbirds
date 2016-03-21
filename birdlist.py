@@ -67,6 +67,7 @@ if __name__ == '__main__':
         at = t.authenticate(access_token, secret)
         tw_list = at.get_list(args.list)
 
-        count = at.add_missing_members(tw_list, users)
-        if count > 0:
-            print("added %d count users to list %s" % (count, args.list))
+        missing_members = at.add_missing_members(tw_list, users)
+        if len(missing_members) > 0:
+            print("added %d users to list %s:" % (len(missing_members), args.list))
+            print(", ".join(missing_members))
